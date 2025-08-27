@@ -1,6 +1,8 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OpenApi;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Instrumentation.EntityFrameworkCore; // <-- trae AddEntityFrameworkCoreInstrumentation
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;

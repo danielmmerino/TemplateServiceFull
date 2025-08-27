@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.OpenApi;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Serilog;
 using TemplateService.Infrastructure.Data;
 using TemplateService.Infrastructure.Models;
@@ -21,11 +22,21 @@ builder.Host.UseSerilog();
 // Config
 var conn = builder.Configuration.GetConnectionString("Default")
            ?? builder.Configuration["ConnectionStrings:Default"];
+if (string.IsNullOrWhiteSpace(conn))
+{
+    var dbHost = builder.Configuration["DB_HOST"] ?? "localhost";
+    var dbPort = builder.Configuration["DB_PORT"] ?? "3306";
+    var dbName = builder.Configuration["DB_NAME"] ?? "TemplateDb";
+    var dbUser = builder.Configuration["DB_USER"] ?? "root";
+    var dbPassword = builder.Configuration["DB_PASSWORD"] ?? string.Empty;
+    conn = $"Server={dbHost};Port={dbPort};Database={dbName};User={dbUser};Password={dbPassword};";
+}
 var rabbitHost = builder.Configuration["RabbitMq:Host"] ?? "localhost";
 var otlpEndpoint = builder.Configuration["Otlp:Endpoint"] ?? "http://localhost:4317";
 
 // DbContext
-builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(conn));
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseMySql(conn, ServerVersion.AutoDetect(conn)));
 
 // MassTransit + RabbitMQ
 builder.Services.AddMassTransit(x =>
@@ -59,7 +70,7 @@ builder.Services.AddSwaggerGen();
 
 // HealthChecks
 builder.Services.AddHealthChecks()
-    .AddSqlServer(conn!, name: "sqlserver");
+    .AddMySql(conn!, name: "mysql");
 
 // CORS dev
 builder.Services.AddCors(options =>

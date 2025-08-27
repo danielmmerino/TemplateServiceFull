@@ -1,12 +1,4 @@
 services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=Your_strong_Passw0rd!
-    ports: ["1433:1433"]
-    volumes: ["sql_data:/var/opt/mssql"]
-
   rabbitmq:
     image: rabbitmq:3-management
     ports: ["5672:5672", "15672:15672"]
@@ -20,14 +12,14 @@ services:
     build:
       context: ./src/TemplateService.Api
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Default=Server=sqlserver,1433;Database=TemplateDb;User Id=sa;Password=Your_strong_Passw0rd;TrustServerCertificate=True
       - RabbitMq__Host=rabbitmq
       - ASPNETCORE_URLS=http://+:8080
       - Otlp__Endpoint=http://jaeger:4317
     depends_on:
-      - sqlserver
       - rabbitmq
       - jaeger
     ports: ["8080:8080"]
@@ -42,5 +34,3 @@ services:
       - template-service
     ports: ["7000:7000"]
 
-volumes:
-  sql_data:

@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch TemplateService.Api",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build TemplateService.Api",
+      "program": "${workspaceFolder}/src/TemplateService.Api/bin/Debug/net8.0/TemplateService.Api.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/TemplateService.Api",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  ]
+}
